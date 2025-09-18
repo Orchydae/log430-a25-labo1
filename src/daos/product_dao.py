@@ -6,12 +6,12 @@ Auteurs : Gabriel C. Ullmann, Fabio Petrillo, 2025
 import os
 from dotenv import load_dotenv
 import mysql.connector
-from models.user import User
+from models.product import Product
 
 class ProductDAO:
     def __init__(self):
         try:
-            env_path = "../.env"
+            env_path = ".env"
             print(os.path.abspath(env_path))
             load_dotenv(dotenv_path=env_path)
             db_host = os.getenv("MYSQL_HOST")
@@ -27,24 +27,56 @@ class ProductDAO:
 
     def select_all(self):
         """ Select all products from MySQL """
-        pass
+        self.cursor.execute("SELECT id, name, brand, price FROM products")
+        rows = self.cursor.fetchall()
+        return [Product(*row) for row in rows]
 
     def insert(self, product):
         """ Insert given product into MySQL """
-        pass
+        sql = "INSERT INTO products (name, brand, price) VALUES (%s, %s, %s)"
+        try:
+            self.cursor.execute(sql, (product.name, product.brand, product.price))
+            self.conn.commit()
+            return self.cursor.lastrowid
+        except Exception:
+            self.conn.rollback()
+            raise
 
     def update(self, product):
         """ Update given product in MySQL """
-        pass
+        if (product.id is None):
+            raise ValueError("Product ID is required for update operation.")
+        sql = "UPDATE products SET name = %s, brand = %s, price = %s WHERE id = %s"
+        try:
+            self.cursor.execute(sql, (product.name, product.brand, product.price, product.id))
+            self.conn.commit()
+            return self.cursor.rowcount
+        except Exception:
+            self.conn.rollback()
+            raise
 
     def delete(self, product_id):
         """ Delete product from MySQL with given product ID """
-        pass
+        sql = "DELETE FROM products WHERE id = %s"
+        try:
+            self.cursor.execute(sql, (product_id,))
+            self.conn.commit()
+            return self.cursor.rowcount
+        except Exception:
+            self.conn.rollback()
+            raise
 
     def delete_all(self): #optional
         """ Empty products table in MySQL """
-        pass
-        
+        sql = "DELETE FROM products"
+        try:
+            self.cursor.execute(sql)
+            self.conn.commit()
+            return self.cursor.rowcount
+        except Exception:
+            self.conn.rollback()
+            raise
+
     def close(self):
         self.cursor.close()
         self.conn.close()

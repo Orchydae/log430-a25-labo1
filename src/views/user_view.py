@@ -12,7 +12,7 @@ class UserView:
         """ Show menu with operation options which can be selected by the user """
         controller = UserController()
         while True:
-            print("\n1. Montrer la liste d'utilisateurs\n2. Ajouter un utilisateur\n3. Quitter l'appli")
+            print("\n1. Montrer la liste d'utilisateurs\n2. Ajouter un utilisateur\n3. Retour au menu principal")
             choice = input("Choisissez une option: ")
 
             if choice == '1':
